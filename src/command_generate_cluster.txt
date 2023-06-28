@@ -1,0 +1,26 @@
+aws emr create-cluster \
+ --name "cluster-bd-proyecto" \
+ --log-uri "s3n://proyecto-big-data-logs/" \
+ --release-label "emr-6.5.0" \
+ --service-role "arn:aws:iam::471147317664:role/service-role/AmazonEMR-ServiceRole-20230623T215236" \
+ --ec2-attributes '{"InstanceProfile":"AmazonEMR-InstanceProfile-20230623T215219",
+                    "EmrManagedMasterSecurityGroup":"sg-06021d20995ef2265",
+                    "EmrManagedSlaveSecurityGroup":"sg-043ec19f16bd00af0",
+                    "KeyName":"big-data-proyecto-key",
+                    "AdditionalMasterSecurityGroups":["sg-021241eb4501b1304","sg-0c1768c8691f4f249"],
+                    "AdditionalSlaveSecurityGroups":["sg-021241eb4501b1304","sg-0c1768c8691f4f249"],
+                    "SubnetId":"subnet-029f18f5138312d10"}' \
+ --tags 'for-use-with-amazon-emr-managed-policies=true' \
+ --applications Name=Hadoop Name=Hive Name=Hue Name=JupyterEnterpriseGateway Name=JupyterHub Name=Livy Name=Pig Name=Spark Name=TensorFlow Name=Tez \
+ --configurations '[{"Classification":"hive-site","Properties":{"hive.metastore.client.factory.class":"com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"}},
+                    {"Classification":"spark-hive-site","Properties":{"hive.metastore.client.factory.class":"com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"}}]' \
+ --instance-groups '[{"InstanceCount":1,"InstanceGroupType":"MASTER",
+                    "Name":"Principal","InstanceType":"m5.xlarge",
+                    "EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"VolumeType":"gp2","SizeInGB":32},"VolumesPerInstance":2}]}},
+                    {"InstanceCount":2,"InstanceGroupType":"CORE",
+                    "Name":"Central","InstanceType":"m5.xlarge",
+                    "EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"VolumeType":"gp2","SizeInGB":32},"VolumesPerInstance":2}]}}]' \
+ --scale-down-behavior "TERMINATE_AT_TASK_COMPLETION" \
+ --ebs-root-volume-size "30" \
+ --auto-termination-policy '{"IdleTimeout":1800}' \
+ --region "us-east-1"
